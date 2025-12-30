@@ -80,7 +80,7 @@ class CountTester:
 
 
 async def main():
-    config = Config.from_yaml("client_config.yaml")
+    config = Config.from_yaml("client/client_config.yaml")
     tester = CountTester(config)
     await tester.run()
 

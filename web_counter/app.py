@@ -21,7 +21,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Initialize storage
-storage = get_storage(storage_type="disk")
+storage = get_storage(storage_type="postgres")
 
 # Initialize request tracker
 tracker = RequestTracker()
@@ -30,6 +30,7 @@ tracker = RequestTracker()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Handle application startup and shutdown."""
+    await storage.initialize()
     yield
     logger.info("Web Counter API shutting down")
 
@@ -47,9 +48,11 @@ app = FastAPI(title="Web Counter API", lifespan=lifespan)
 @app.middleware("http")
 async def track_inc_requests(request: Request, call_next):
     """Middleware to track all incoming requests."""
-    response = await call_next(request)
-    if request.url.path == "/inc":  # Track only /inc requests
+    # Track request BEFORE processing
+    if request.url.path == "/inc":
         await tracker.record()
+
+    response = await call_next(request)
     return response
 
 
