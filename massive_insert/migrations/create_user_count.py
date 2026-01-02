@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 def run_migration():
     """Create user_count table if not exists with user_id, count, and version fields"""
-
     # Database connection parameters
     db_params = {
         "host": os.getenv("DB_HOST", "localhost"),
@@ -27,11 +26,10 @@ def run_migration():
         logger.info(
             "Connecting to PostgreSQL at %s:%s", db_params["host"], db_params["port"]
         )
-        with psycopg.connect(**db_params) as conn:
-            with conn.cursor() as cur:
-                logger.info("Creating table user_count if not exists...")
+        with psycopg.connect(**db_params) as conn, conn.cursor() as cur:
+            logger.info("Creating table user_count if not exists...")
 
-                cur.execute("""
+            cur.execute("""
                     CREATE TABLE IF NOT EXISTS user_count (
                         user_id BIGINT PRIMARY KEY,
                         count INTEGER NOT NULL DEFAULT 0,
@@ -39,8 +37,8 @@ def run_migration():
                     );
                 """)
 
-                conn.commit()
-                logger.info("Table user_count created successfully!")
+            conn.commit()
+            logger.info("Table user_count created successfully!")
 
     except Exception as e:
         logger.error("Error during migration: %s", e, exc_info=True)

@@ -8,6 +8,10 @@ class CounterStorage(ABC):
         """Initialize the storage."""
         pass
 
+    async def close(self):
+        pass
+        """Close the storage."""
+
     @abstractmethod
     async def increment(self) -> int:
         """Increment the counter and return the new value."""

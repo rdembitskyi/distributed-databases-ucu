@@ -1,8 +1,6 @@
-import psycopg
-import os
+from psycopg_pool import AsyncConnectionPool
 from storage.storage import CounterStorage
 from utils.singletone import singleton
-from psycopg_pool import AsyncConnectionPool
 
 
 @singleton
@@ -32,13 +30,12 @@ class PostgresStorage(CounterStorage):
 
     async def get_count(self) -> int:
         """Async get count"""
-        async with self.pool.connection() as conn:
-            async with conn.cursor() as cursor:
-                await cursor.execute(
-                    "SELECT count FROM user_count WHERE user_id = %s", (1,)
-                )
-                result = await cursor.fetchone()
-                return result[0]
+        async with self.pool.connection() as conn, conn.cursor() as cursor:
+            await cursor.execute(
+                "SELECT count FROM user_count WHERE user_id = %s", (1,)
+            )
+            result = await cursor.fetchone()
+            return result[0]
 
     async def close(self):
         """Close pool"""

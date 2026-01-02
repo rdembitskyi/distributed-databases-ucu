@@ -1,7 +1,7 @@
+from collections.abc import Callable
 import logging
 import threading
 import time
-from typing import Callable
 
 from db_queries.shared import get_db_connection
 from psycopg import errors
@@ -123,8 +123,7 @@ def perform_concurrent_update(
     user_id: int = 1,
     enable_retry: bool = False,
 ):
-    """
-    General wrapper function for concurrent update tests
+    """General wrapper function for concurrent update tests
 
     Args:
         clients_amount: Number of concurrent clients (threads)
