@@ -21,7 +21,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Initialize storage
-storage = get_storage(storage_type="hazelcast")
+storage = get_storage(storage_type="mongodb")
 
 # Initialize request tracker
 tracker = RequestTracker()

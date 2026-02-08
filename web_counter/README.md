@@ -5,7 +5,7 @@ Simple async web counter built with FastAPI to benchmark storage backends and me
 ## Stack
 
 - FastAPI + Uvicorn (async)
-- Storage: In-memory, Disk (with fsync), PostgreSQL, or Hazelcast AtomicLong
+- Storage: In-memory, Disk (with fsync), PostgreSQL, Hazelcast AtomicLong, or MongoDB
 - Client: httpx for concurrent load testing
 
 ## API
@@ -46,16 +46,18 @@ Config: `client/client_config.yaml`
 
 ## Benchmark Results (MacBook Pro 2023 on SSD)
 
-- Memory storage: ~1900 RPS
+- Ram Memory storage: ~1900 RPS
 - Disk storage (no fsync): ~1050 RPS
 - Disk storage (with fsync): ~900 RPS
 - PostgreSQL storage: ~943 RPS
 - Hazelcast AtomicLong: ~500 RPS
   - Note: Not fully async, uses `asyncio.to_thread()` + cluster overhead
+- MongoDB storage (w=1, j=False): ~1333 RPS
+- MongoDB storage (w=1, j=True): ~1087 RPS
 
 ## Architecture
 
-- **Storage**: Abstract interface with multiple implementations (in-memory, disk, PostgreSQL, Hazelcast)
+- **Storage**: Abstract interface with multiple implementations (in-memory, disk, PostgreSQL, Hazelcast, MongoDB)
 - **Middleware**: Request tracking for RPS calculation
 - **Domain**: Pydantic models for type safety
 - **Client**: Async concurrent load tester (10 clients, 10k requests)
