@@ -1,0 +1,86 @@
+services:
+  cassandra-node-1:
+    image: cassandra:5.0.6
+    container_name: cassandra-node-1
+    ports:
+      - "9042:9042"
+    environment:
+      - CASSANDRA_CLUSTER_NAME=test-cluster
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack1
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=128M
+    mem_limit: 1g
+    volumes:
+      - cassandra-data-1:/var/lib/cassandra
+    networks:
+      - cassandra-net
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status"]
+      interval: 2m
+      start_period: 2m
+      timeout: 10s
+      retries: 3
+
+  cassandra-node-2:
+    image: cassandra:5.0.6
+    container_name: cassandra-node-2
+    ports:
+      - "9043:9042"
+    environment:
+      - CASSANDRA_SEEDS=cassandra-node-1
+      - CASSANDRA_CLUSTER_NAME=test-cluster
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack2
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=128M
+    mem_limit: 1g
+    volumes:
+      - cassandra-data-2:/var/lib/cassandra
+    networks:
+      - cassandra-net
+    restart: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "nodetool status"]
+      interval: 2m
+      start_period: 4m
+      timeout: 10s
+      retries: 3
+    depends_on:
+      cassandra-node-1:
+        condition: service_healthy
+
+  cassandra-node-3:
+    image: cassandra:5.0.6
+    container_name: cassandra-node-3
+    ports:
+      - "9044:9042"
+    environment:
+      - CASSANDRA_SEEDS=cassandra-node-1
+      - CASSANDRA_CLUSTER_NAME=test-cluster
+      - CASSANDRA_DC=dc1
+      - CASSANDRA_RACK=rack3
+      - CASSANDRA_ENDPOINT_SNITCH=GossipingPropertyFileSnitch
+      - MAX_HEAP_SIZE=512M
+      - HEAP_NEWSIZE=128M
+    mem_limit: 1g
+    volumes:
+      - cassandra-data-3:/var/lib/cassandra
+    networks:
+      - cassandra-net
+    restart: on-failure
+    depends_on:
+      cassandra-node-2:
+        condition: service_healthy
+
+volumes:
+  cassandra-data-1:
+  cassandra-data-2:
+  cassandra-data-3:
+
+networks:
+  cassandra-net:
+    driver: bridge
