@@ -5,7 +5,7 @@ Simple async web counter built with FastAPI to benchmark storage backends and me
 ## Stack
 
 - FastAPI + Uvicorn (async)
-- Storage: In-memory, Disk (with fsync), PostgreSQL, Hazelcast AtomicLong, or MongoDB
+- Storage: In-memory, Disk (with fsync), PostgreSQL, Hazelcast AtomicLong, MongoDB, or Cassandra
 - Client: httpx for concurrent load testing
 
 ## API
@@ -54,10 +54,11 @@ Config: `client/client_config.yaml`
   - Note: Not fully async, uses `asyncio.to_thread()` + cluster overhead
 - MongoDB storage (w=1, j=False): ~1333 RPS
 - MongoDB storage (w=1, j=True): ~1087 RPS
+- Cassandra storage (3-node cluster, replication_factor = 1, counter column): ~943 RPS
 
 ## Architecture
 
-- **Storage**: Abstract interface with multiple implementations (in-memory, disk, PostgreSQL, Hazelcast, MongoDB)
+- **Storage**: Abstract interface with multiple implementations (in-memory, disk, PostgreSQL, Hazelcast, MongoDB, Cassandra)
 - **Middleware**: Request tracking for RPS calculation
 - **Domain**: Pydantic models for type safety
 - **Client**: Async concurrent load tester (10 clients, 10k requests)

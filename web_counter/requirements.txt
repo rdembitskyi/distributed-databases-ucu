@@ -6,3 +6,4 @@ PyYAML==6.0.3
 psycopg[binary,pool]==3.3.2
 hazelcast-python-client==5.4.0
 motor==3.7.1
+cassandra-driver
