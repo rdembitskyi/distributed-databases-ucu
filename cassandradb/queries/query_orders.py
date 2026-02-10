@@ -123,6 +123,23 @@ def writetime_of_total_price():
     cluster.shutdown()
 
 
+def total_sum_per_customer():
+    """For each customer, find the total sum of all their orders."""
+    cluster = Cluster(["localhost"], port=9042)
+    session = cluster.connect("test_keyspace")
+    session.default_timeout = 60
+
+    rows = session.execute(
+        "SELECT customer_name, SUM(total_price) as total_sum FROM orders GROUP BY customer_name"
+    )
+
+    print("=== Total order sum per customer ===")
+    for row in rows:
+        print(f"  {row.customer_name} | total sum: {row.total_sum}")
+
+    cluster.shutdown()
+
+
 if __name__ == "__main__":
     # 1 - describe orders table
     describe_orders()
@@ -141,3 +158,6 @@ if __name__ == "__main__":
 
     # 6 - writetime of total_price for each order
     writetime_of_total_price()
+
+    # 7 - total sum of orders per customer
+    total_sum_per_customer()

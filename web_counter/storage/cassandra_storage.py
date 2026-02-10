@@ -23,9 +23,7 @@ class CassandraStorage(CounterStorage):
             """,
         )
 
-        await asyncio.to_thread(
-            self.session.execute, "USE web_counter"
-        )
+        await asyncio.to_thread(self.session.execute, "USE web_counter")
 
         await asyncio.to_thread(
             self.session.execute,
@@ -37,9 +35,7 @@ class CassandraStorage(CounterStorage):
             """,
         )
 
-        await asyncio.to_thread(
-            self.session.execute, "TRUNCATE counter"
-        )
+        await asyncio.to_thread(self.session.execute, "TRUNCATE counter")
 
     async def increment(self) -> int:
         await asyncio.to_thread(
