@@ -13,11 +13,6 @@ def describe_tables():
 
     print()
 
-    result = session.execute("DESCRIBE TABLE orders")
-    print("=== ORDERS TABLE ===")
-    for row in result:
-        print(row.create_statement)
-
     cluster.shutdown()
 
 

@@ -33,17 +33,23 @@ def create_tables():
         ON items (name)
     """)
 
+    session.execute("DROP TABLE IF EXISTS orders")
+
     session.execute("""
         CREATE TABLE IF NOT EXISTS orders (
             id UUID,
             customer_name TEXT,
             order_date TIMESTAMP,
-            item_id UUID,
-            quantity INT,
+            item_ids SET<UUID>,
             total_price DECIMAL,
             status TEXT,
-            PRIMARY KEY (id, order_date)
-        ) WITH CLUSTERING ORDER BY (order_date DESC)
+            PRIMARY KEY (customer_name, order_date, id)
+        ) WITH CLUSTERING ORDER BY (order_date DESC, id ASC)
+    """)
+
+    session.execute("""
+        CREATE INDEX IF NOT EXISTS idx_orders_item_ids
+        ON orders (item_ids)
     """)
 
     print("Tables 'items' and 'orders' created successfully")

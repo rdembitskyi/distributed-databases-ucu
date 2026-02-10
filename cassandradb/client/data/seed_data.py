@@ -9,6 +9,9 @@ def seed_data():
     session = cluster.connect("test_keyspace")
     session.default_timeout = 60
 
+    session.execute("TRUNCATE items")
+    session.execute("TRUNCATE orders")
+
     items = [
         (
             "Laptop Pro 15",
@@ -83,18 +86,20 @@ def seed_data():
     print(f"Inserted {len(items)} items")
 
     orders = [
-        (item_ids[0], "Alice Johnson", 1, 1299.99, "delivered"),
-        (item_ids[2], "Bob Smith", 2, 179.98, "shipped"),
-        (item_ids[4], "Charlie Brown", 1, 59.99, "pending"),
+        ("Alice Johnson", {item_ids[0], item_ids[1]}, 1329.98, "delivered"),
+        ("Alice Johnson", {item_ids[6]}, 79.99, "pending"),
+        ("Bob Smith", {item_ids[2], item_ids[5]}, 114.98, "shipped"),
+        ("Charlie Brown", {item_ids[4], item_ids[3]}, 209.98, "pending"),
+        ("Charlie Brown", {item_ids[7], item_ids[6], item_ids[2]}, 279.97, "delivered"),
     ]
 
-    for item_id, customer, quantity, total, status in orders:
+    for customer, items_set, total, status in orders:
         session.execute(
             """
-            INSERT INTO orders (id, customer_name, order_date, item_id, quantity, total_price, status)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO orders (id, customer_name, order_date, item_ids, total_price, status)
+            VALUES (%s, %s, %s, %s, %s, %s)
             """,
-            (uuid.uuid4(), customer, datetime.now(), item_id, quantity, total, status),
+            (uuid.uuid4(), customer, datetime.now(), items_set, total, status),
         )
 
     print(f"Inserted {len(orders)} orders")
