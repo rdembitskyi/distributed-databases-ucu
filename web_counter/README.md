@@ -55,10 +55,12 @@ Config: `client/client_config.yaml`
 - MongoDB storage (w=1, j=False): ~1333 RPS
 - MongoDB storage (w=1, j=True): ~1087 RPS
 - Cassandra storage (3-node cluster, replication_factor = 1, counter column): ~943 RPS
+- Neo4j storage: ~512 RPS
+  - Note: Slowest backend, but expected — counters on a graph DB are exotic
 
 ## Architecture
 
-- **Storage**: Abstract interface with multiple implementations (in-memory, disk, PostgreSQL, Hazelcast, MongoDB, Cassandra)
+- **Storage**: Abstract interface with multiple implementations (in-memory, disk, PostgreSQL, Hazelcast, MongoDB, Cassandra, Neo4j)
 - **Middleware**: Request tracking for RPS calculation
 - **Domain**: Pydantic models for type safety
 - **Client**: Async concurrent load tester (10 clients, 10k requests)

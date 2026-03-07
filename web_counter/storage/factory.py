@@ -4,6 +4,7 @@ from storage.disk_storage import DiskStorage
 from storage.inmemory_storage import InMemoryStorage
 from storage.mongo import MongoDbStorage
 from storage.postgres import PostgresStorage
+from storage.neo4j import Neo4jStorage
 
 
 def get_storage(storage_type: str):
@@ -17,4 +18,6 @@ def get_storage(storage_type: str):
         return MongoDbStorage()
     elif storage_type == "cassandra":
         return CassandraStorage()
+    elif storage_type == "neo4j":
+        return Neo4jStorage()
     return InMemoryStorage()
