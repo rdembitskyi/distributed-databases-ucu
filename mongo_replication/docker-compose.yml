@@ -1,0 +1,81 @@
+services:
+  mongo1:
+    image: mongo:8.2
+    container_name: mongo1
+    command: ["mongod", "--replSet", "rs_test", "--bind_ip_all", "--port", "27017"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo1_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27017", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongo2:
+    image: mongo:8.2
+    container_name: mongo2
+    command: ["mongod", "--replSet", "rs_test", "--bind_ip_all", "--port", "27018"]
+    ports:
+      - "27018:27018"
+    volumes:
+      - mongo2_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27018", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongo3:
+    image: mongo:8.2
+    container_name: mongo3
+    command: ["mongod", "--replSet", "rs_test", "--bind_ip_all", "--port", "27019"]
+    ports:
+      - "27019:27019"
+    volumes:
+      - mongo3_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--port", "27019", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongo-init:
+    image: mongo:8.2
+    container_name: mongo_init
+    depends_on:
+      mongo1:
+        condition: service_healthy
+      mongo2:
+        condition: service_healthy
+      mongo3:
+        condition: service_healthy
+    command: >
+      bash -c "sleep 5 && mongosh --host mongo1:27017 --eval '
+        rs.initiate({
+          _id: \"rs_test\",
+          members: [
+            { _id: 0, host: \"mongo1:27017\", priority: 2 },
+            { _id: 1, host: \"mongo2:27018\", priority: 1 },
+            { _id: 2, host: \"mongo3:27019\", priority: 1 }
+          ]
+        });
+      '"
+    restart: "no"
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo_express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo1:27017,mongo2:27018,mongo3:27019/?replicaSet=rs_test
+    depends_on:
+      mongo-init:
+        condition: service_completed_successfully
+
+volumes:
+  mongo1_data:
+  mongo2_data:
+  mongo3_data:
