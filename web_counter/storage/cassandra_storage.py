@@ -1,6 +1,8 @@
 import asyncio
 
 from cassandra.cluster import Cluster
+from cassandra import ConsistencyLevel
+from cassandra.query import SimpleStatement
 from storage.storage import CounterStorage
 from utils.singletone import singleton
 
@@ -19,7 +21,7 @@ class CassandraStorage(CounterStorage):
             self.session.execute,
             """
             CREATE KEYSPACE IF NOT EXISTS web_counter
-            WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1}
+            WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 3}
             """,
         )
 
@@ -38,9 +40,13 @@ class CassandraStorage(CounterStorage):
         await asyncio.to_thread(self.session.execute, "TRUNCATE counter")
 
     async def increment(self) -> int:
+        stmt = SimpleStatement(
+            "UPDATE counter SET count = count + 1 WHERE id = 'counter'",
+            consistency_level=ConsistencyLevel.QUORUM,
+        )
         await asyncio.to_thread(
             self.session.execute,
-            "UPDATE counter SET count = count + 1 WHERE id = 'counter'",
+            stmt,
         )
         # just to speed up things
         return 0
