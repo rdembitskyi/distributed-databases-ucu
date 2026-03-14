@@ -1,0 +1,9 @@
+GCS_BUCKET = "oklev-uku-datasets"
+GCS_PREFIX = "fraud-detection-splitted"
+PROJECT_ID = "spring-melody-472217-a1"
+TOPIC_ID = "fraud-detection"
+SUBSCRIPTION_ID = "fraud-detection-sub"
+GCS_STREAM_BUCKET = "rd-ucu-bucket"
+GCS_STREAM_PREFIX = "fraud-detection-stream"
+BATCH_SIZE = 10
+FLUSH_INTERVAL = 30  # seconds

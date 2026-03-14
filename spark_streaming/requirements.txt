@@ -1,0 +1,4 @@
+google-cloud-storage==3.9.0
+google-cloud-pubsub==2.36.0
+pyspark==4.0.0
+dataproc_spark_connect==1.0.2
